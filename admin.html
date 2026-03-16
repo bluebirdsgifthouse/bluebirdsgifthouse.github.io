@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Bluebirds Gift House</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1008;--warm:#2d1a08;--mid:#6b4c2a;--light:#a8815a;--pale:#f5ede0;--cream:#fdf8f0;--gold:#c9973a;--gold2:#e8b84b;--accent:#b5451b;--green:#1a6b3a;--white:#fffef9;--border:1px solid rgba(201,151,58,0.25)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#ede5d8;color:var(--ink);min-height:100vh}
+
+/* LOGIN */
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--warm),#4a2d10)}
+.lb{background:var(--white);border-radius:24px;padding:46px 38px;width:min(400px,92vw);text-align:center;box-shadow:0 40px 80px rgba(0,0,0,.3)}
+.li{font-size:3rem;margin-bottom:14px}.lt{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--warm);margin-bottom:5px}
+.ls{font-size:.85rem;color:var(--mid);margin-bottom:24px}
+.lerr{background:rgba(181,69,27,.1);border:1px solid rgba(181,69,27,.35);color:var(--accent);padding:10px 14px;border-radius:10px;font-size:.82rem;margin-bottom:12px;display:none}.lerr.on{display:block}
+.linp{width:100%;padding:12px 16px;border:var(--border);border-radius:12px;background:var(--pale);font-family:'DM Sans',sans-serif;font-size:.95rem;margin-bottom:12px;outline:none;transition:border-color .2s}.linp:focus{border-color:var(--gold)}
+.lbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#b8832a);color:white;border:none;border-radius:50px;font-weight:700;font-size:1rem;cursor:pointer;transition:all .3s}.lbtn:hover{transform:translateY(-2px)}
+.lnote{font-size:.74rem;color:var(--light);margin-top:12px}
+
+/* APP */
+.app{display:none;min-height:100vh}.app.show{display:flex}
+.sb{width:240px;background:var(--warm);color:white;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:100;overflow-y:auto;transition:transform .3s}
+.sbb{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
+.sbd{font-size:1.6rem;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+.sbn{font-family:'Playfair Display',serif;font-size:.9rem;color:rgba(253,248,240,.95);line-height:1.3}.sbns{font-size:.66rem;color:rgba(253,248,240,.45);margin-top:2px}
+.sbnav{flex:1;padding:10px 0}
+.sg{padding:6px 16px 2px;font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;color:rgba(253,248,240,.3);margin-top:4px}
+.ni{display:flex;align-items:center;gap:9px;padding:10px 16px;color:rgba(253,248,240,.7);cursor:pointer;transition:all .2s;font-size:.84rem;font-weight:500;border-left:3px solid transparent}
+.ni:hover{background:rgba(255,255,255,.08);color:white}.ni.on{background:rgba(201,151,58,.2);color:var(--gold2);border-left-color:var(--gold)}
+.ni-ic{width:18px;text-align:center;font-size:.95rem}
+.sbf{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1)}
+.sbfs{font-size:.73rem;color:rgba(253,248,240,.45);margin-bottom:7px}
+.sbo{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(253,248,240,.7);padding:7px 12px;border-radius:50px;cursor:pointer;font-size:.77rem;width:100%;transition:all .2s}.sbo:hover{background:rgba(255,255,255,.18);color:white}
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.tb{background:var(--white);border-bottom:var(--border);padding:0 22px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;gap:10px}
+.tbt{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--warm);flex-shrink:0}
+.tbr{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.bprev{background:var(--pale);border:var(--border);color:var(--mid);padding:6px 13px;border-radius:50px;font-size:.79rem;cursor:pointer;text-decoration:none;transition:all .2s}.bprev:hover{background:var(--warm);color:white}
+.bpub{border:none;padding:8px 16px;border-radius:50px;font-weight:700;font-size:.84rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap;background:linear-gradient(135deg,#1a6b3a,#0f4d28);color:white}.bpub:hover{transform:translateY(-1px)}.bpub:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.mobb{display:none;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--warm)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:50px;font-size:.74rem;font-weight:600;border:1px solid transparent;white-space:nowrap}
+.chip.y{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#b45309}
+.chip.g{background:rgba(26,107,58,.1);border-color:rgba(26,107,58,.3);color:var(--green)}
+.chip.r{background:rgba(181,69,27,.1);border-color:rgba(181,69,27,.3);color:var(--accent)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot.g{background:var(--green)}.dot.r{background:var(--accent)}.dot.y{background:#f59e0b}.dot.spin{background:var(--gold2);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.ct{padding:22px;flex:1}
+
+/* CARDS & BOXES */
+.srow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.sc{background:var(--white);border-radius:13px;padding:16px;border:var(--border)}.sci{font-size:1.4rem;margin-bottom:6px}.scn{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--warm)}.scl{font-size:.73rem;color:var(--light);margin-top:2px}
+.box{background:var(--white);border-radius:13px;border:var(--border);overflow:hidden;margin-bottom:18px;box-shadow:0 2px 8px rgba(26,16,8,.05)}
+.bh{padding:13px 16px;border-bottom:var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--pale)}
+.bht{font-family:'Playfair Display',serif;font-size:.92rem;color:var(--warm);font-weight:700}.bb{padding:16px}
+
+/* FORMS */
+.fl{display:block;font-size:.69rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.fi{width:100%;padding:9px 12px;border:var(--border);border-radius:9px;background:var(--pale);font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--ink);outline:none;transition:border-color .2s;margin-bottom:10px}.fi:focus{border-color:var(--gold)}
+textarea.fi{resize:vertical;min-height:64px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+.badd{background:linear-gradient(135deg,var(--gold),#b8832a);color:white;border:none;padding:9px 18px;border-radius:50px;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px}.badd:hover{transform:translateY(-1px)}
+.bfull{width:100%;padding:12px;border-radius:50px;font-weight:700;font-size:.86rem;cursor:pointer;border:none;background:linear-gradient(135deg,var(--warm),#4a2d10);color:white;transition:all .2s;margin-top:4px}.bfull:hover{transform:translateY(-1px)}
+.bdel{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:5px 11px;border-radius:50px;font-size:.72rem;cursor:pointer;transition:all .2s}.bdel:hover{background:var(--accent);color:white}
+.bedit{background:transparent;border:var(--border);color:var(--mid);padding:5px 11px;border-radius:50px;font-size:.72rem;cursor:pointer;transition:all .2s}.bedit:hover{background:var(--pale);border-color:var(--gold);color:var(--gold)}
+
+/* ROWS */
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:10px;padding:10px;border:var(--border);border-radius:9px;background:var(--cream);transition:all .2s}.row:hover{border-color:var(--gold);background:var(--white)}
+.rth{width:46px;height:52px;border-radius:7px;overflow:hidden;background:var(--pale);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;border:var(--border)}.rth img{width:100%;height:100%;object-fit:cover}
+.ri{flex:1;min-width:0}.rn{font-weight:600;font-size:.84rem;color:var(--warm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rm{font-size:.72rem;color:var(--light);margin-top:2px}
+.ra{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap}
+
+/* IMAGE ZONES */
+.iz{border:2px dashed rgba(201,151,58,.4);border-radius:9px;padding:16px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(201,151,58,.02);margin-bottom:9px;position:relative;user-select:none;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.iz:hover{border-color:var(--gold);background:rgba(201,151,58,.06)}
+.iz.loaded{padding:0;overflow:hidden;height:140px;border-style:solid;border-color:var(--gold);display:block}
+.iz.loaded img,.iz.loaded video{width:100%;height:100%;object-fit:cover;display:block}
+.iz.loaded::after{content:'📷 Change';position:absolute;inset:0;background:rgba(45,26,8,.55);color:white;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:600;opacity:0;transition:opacity .3s}.iz.loaded:hover::after{opacity:1;display:flex}
+.izx{position:absolute;top:5px;right:5px;width:22px;height:22px;background:var(--accent);color:white;border:none;border-radius:50%;cursor:pointer;font-size:.7rem;z-index:5;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}.iz.loaded:hover .izx{opacity:1}
+
+/* SUBCATS */
+.subcat-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;margin-bottom:10px}
+.subcat-chip{background:var(--pale);border:var(--border);border-radius:50px;padding:4px 11px;font-size:.75rem;display:flex;align-items:center;gap:5px;color:var(--mid)}
+.subcat-chip button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:.82rem;padding:0;line-height:1}
+
+/* DESIGN PAGE */
+.color-picker-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.color-preview{width:42px;height:42px;border-radius:8px;border:var(--border);cursor:pointer;flex-shrink:0;position:relative;overflow:hidden}
+.color-preview input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+.preset{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}.preset:hover{transform:scale(1.15);border-color:var(--gold)}
+.font-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.font-opt{border:2px solid var(--pale);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;text-align:center}.font-opt.on,.font-opt:hover{border-color:var(--gold);background:rgba(201,151,58,.06)}
+.font-name{font-size:.78rem;font-weight:600;color:var(--warm);margin-bottom:4px}
+.font-preview{font-size:1.1rem;color:var(--mid)}
+
+/* INFO BOXES */
+.ib{border-radius:11px;padding:13px;margin-bottom:13px;font-size:.82rem;line-height:1.7}
+.ig{background:rgba(26,107,58,.06);border:1px solid rgba(26,107,58,.25);color:#0f4d28}
+.io{background:rgba(201,151,58,.08);border:var(--border);color:var(--mid)}
+.ir{background:rgba(181,69,27,.06);border:1px solid rgba(181,69,27,.25);color:#7a2010}
+.ibl{background:rgba(37,99,211,.06);border:1px solid rgba(37,99,211,.25);color:#1e3a8a}
+.ib code{background:rgba(0,0,0,.07);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.81rem}
+
+/* CODEBOX */
+.codebox{background:#1a1008;color:#86efac;border-radius:9px;padding:14px;font-family:monospace;font-size:.86rem;line-height:1.8;overflow-x:auto;margin:9px 0;white-space:pre;position:relative}
+.cbcopy{position:absolute;top:8px;right:8px;background:rgba(134,239,172,.15);border:1px solid rgba(134,239,172,.3);color:#86efac;padding:3px 9px;border-radius:5px;cursor:pointer;font-size:.73rem;font-family:inherit}.cbcopy:hover{background:rgba(134,239,172,.3)}
+.log{background:#1a1008;color:#e8f5e9;border-radius:9px;padding:13px;font-family:monospace;font-size:.77rem;line-height:1.8;max-height:200px;overflow-y:auto;margin-top:9px}
+
+/* QUICK LINKS */
+.qlg{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
+.ql{background:var(--pale);border:var(--border);border-radius:11px;padding:14px;cursor:pointer;transition:all .2s;text-align:center}.ql:hover{background:var(--gold);color:white;border-color:var(--gold);transform:translateY(-2px)}
+.qli{font-size:1.6rem;margin-bottom:6px}.qln{font-size:.81rem;font-weight:600}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;z-index:9999;padding:12px 16px;border-radius:11px;font-size:.85rem;font-weight:600;transform:translateY(80px);opacity:0;transition:all .4s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}.toast.ok{background:#1a6b3a;color:white}.toast.err{background:var(--accent);color:white}.toast.info{background:var(--warm);color:white}
+
+/* TRES */
+.tres{border-radius:11px;padding:13px;margin-top:11px;font-size:.87rem;font-weight:600;display:none}.tres.on{display:block}
+.tres.ok{background:#dcfce7;border:1px solid #86efac;color:#14532d}.tres.bad{background:#fef2f2;border:1px solid #fca5a5;color:#7f1d1d}
+.tbtn{padding:11px 22px;border-radius:50px;font-weight:700;font-size:.88rem;cursor:pointer;border:none;transition:all .3s;display:inline-flex;align-items:center;gap:7px}
+.tbtn.bl{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white}.tbtn.gn{background:linear-gradient(135deg,#16a34a,#15803d);color:white}.tbtn:hover{transform:translateY(-2px)}
+
+@media(max-width:768px){
+  .sb{transform:translateX(-100%)}.sb.open{transform:translateX(0)}.main{margin-left:0}.mobb{display:block}
+  .f2,.f3{grid-template-columns:1fr}.srow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="T"></div>
+
+<!-- LOGIN -->
+<div class="lw" id="LW">
+  <div class="lb">
+    <div class="li">🐦</div>
+    <div class="lt">Admin Login</div>
+    <div class="ls">Bluebirds Gift House — Akot</div>
+    <div class="lerr" id="lerr">❌ Wrong password. Please try again.</div>
+    <input class="linp" type="password" id="lpwd" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')login()">
+    <button class="lbtn" onclick="login()">🔓 Login</button>
+    <div class="lnote">🔒 Store owner access only</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="APP">
+  <div class="sb" id="SB">
+    <div class="sbb"><span class="sbd">🐦</span><div><div class="sbn">Bluebirds Gift House</div><div class="sbns">Admin · Akot</div></div></div>
+    <nav class="sbnav">
+      <div class="sg">STORE</div>
+      <div class="ni on"  onclick="pg('dash')">    <span class="ni-ic">📊</span> Dashboard</div>
+      <div class="ni"     onclick="pg('prods')">   <span class="ni-ic">🖼️</span> Products</div>
+      <div class="ni"     onclick="pg('cats')">    <span class="ni-ic">🏷️</span> Categories</div>
+      <div class="ni"     onclick="pg('revs')">    <span class="ni-ic">⭐</span> Reviews</div>
+      <div class="sg">CONTENT</div>
+      <div class="ni"     onclick="pg('hero')">    <span class="ni-ic">🌟</span> Hero Banner</div>
+      <div class="ni"     onclick="pg('biz')">     <span class="ni-ic">🏪</span> Business Info</div>
+      <div class="sg">DESIGN</div>
+      <div class="ni"     onclick="pg('logo')">    <span class="ni-ic">🐦</span> Logo & Brand</div>
+      <div class="ni"     onclick="pg('colors')">  <span class="ni-ic">🎨</span> Colors & Theme</div>
+      <div class="ni"     onclick="pg('background')"><span class="ni-ic">🖼️</span> Background</div>
+      <div class="ni"     onclick="pg('fonts')">   <span class="ni-ic">✍️</span> Fonts & Text</div>
+      <div class="sg">TOOLS</div>
+      <div class="ni"     onclick="pg('deploy')">  <span class="ni-ic">🚀</span> Deploy & Share</div>
+      <div class="ni"     onclick="pg('fix')">     <span class="ni-ic">🔧</span> Fix Firebase</div>
+    </nav>
+    <div class="sbf"><div class="sbfs" id="sbSt">⏳ Connecting...</div><button class="sbo" onclick="logout()">🚪 Logout</button></div>
+  </div>
+  <div class="main">
+    <div class="tb">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="mobb" onclick="document.getElementById('SB').classList.toggle('open')">☰</button>
+        <div class="tbt" id="TBT">Dashboard</div>
+      </div>
+      <div class="tbr">
+        <div class="chip y" id="FC"><div class="dot spin"></div><span id="FT">Connecting...</span></div>
+        <a href="index.html" target="_blank" class="bprev">👁️ View Site</a>
+        <button class="bpub" id="PB" onclick="publish()">☁️ Save &amp; Publish</button>
+      </div>
+    </div>
+    <div class="ct" id="MC"></div>
+  </div>
+</div>
+
+<!-- PRE-DEFINE login so button always works regardless of Firebase load state -->
+<script>
+window.login=function(){
+  const pwd=document.getElementById("lpwd");
+  const stored=localStorage.getItem("bbgh_pwd")||"bluebirds2025";
+  if(pwd&&pwd.value===stored){
+    document.getElementById("LW").style.display="none";
+    document.getElementById("APP").classList.add("show");
+    if(typeof pg==="function") pg("dash");
+  } else {
+    const err=document.getElementById("lerr");
+    if(err) err.classList.add("on");
+    if(pwd){pwd.value="";pwd.focus();}
+  }
+};
+window.logout=function(){
+  document.getElementById("APP").classList.remove("show");
+  document.getElementById("LW").style.display="flex";
+  document.getElementById("lpwd").value="";
+  document.getElementById("lerr").classList.remove("on");
+};
+</script>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const app = initializeApp({
+  apiKey:"AIzaSyDqASs_I0FaoF5qSCT0cHwkSopAecAi8EQ",
+  authDomain:"bluebirdsgifthouse.firebaseapp.com",
+  databaseURL:"https://bluebirdsgifthouse-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"bluebirdsgifthouse",
+  storageBucket:"bluebirdsgifthouse.firebasestorage.app",
+  messagingSenderId:"36405661254",
+  appId:"1:36405661254:web:920206b0ab6bd9b6e94447"
+});
+const db=getDatabase(app);
+window._db=db;window._ref=ref;window._set=set;window._get=get;
+window.FB_URL="https://bluebirdsgifthouse-default-rtdb.asia-southeast1.firebasedatabase.app";
+
+get(ref(db,"storeData")).then(snap=>{
+  const d=snap.val();
+  if(d){window.D=d;localStorage.setItem("bbgh_cache",JSON.stringify(d));}
+  setChip("g","✅ Connected");window.FB_OK=true;addLog("✅ Connected to Firebase","ok");
+}).catch(e=>{
+  window.FB_OK=false;
+  setChip("r",e.message.includes("PERMISSION_DENIED")?"❌ Rules Blocked":"❌ Failed");
+  addLog("❌ "+e.message,"err");
+  const c=localStorage.getItem("bbgh_cache");if(c)window.D=JSON.parse(c);
+});
+
+window.fbPush=async(data)=>{
+  try{setChip("y","⏳ Saving...");await set(ref(db,"storeData"),data);setChip("g","✅ Published!");localStorage.setItem("bbgh_cache",JSON.stringify(data));addLog("✅ Published!","ok");setTimeout(()=>setChip("g","✅ Connected"),3000);return{ok:true};}
+  catch(e){setChip("r","❌ Failed");addLog("❌ "+e.message,"err");return{ok:false,err:e.message};}
+};
+window.fbTestWrite=async()=>{
+  try{await set(ref(db,"_test"),{ts:Date.now()});return{ok:true};}catch(e){return{ok:false,err:e.message};}
+};
+function setChip(color,txt){
+  const c=document.getElementById("FC"),d=c?.querySelector(".dot"),s=document.getElementById("FT");
+  if(c)c.className="chip "+(color==="g"?"g":color==="r"?"r":"y");
+  if(d)d.className="dot "+(color==="g"?"g":color==="r"?"r":color==="spin"?"spin":"y");
+  if(s)s.textContent=txt;const sb=document.getElementById("sbSt");if(sb)sb.textContent=txt;
+}
+function addLog(msg,type="info"){
+  window.LOGS=window.LOGS||[];window.LOGS.push({msg,type,t:new Date().toLocaleTimeString()});
+  const el=document.getElementById("logBox");
+  if(el){const C={ok:"#86efac",err:"#fca5a5",warn:"#fde68a",info:"#93c5fd"};el.innerHTML=(window.LOGS||[]).map(l=>`<div style="color:${C[l.type]||C.info}">[${l.t}] ${l.msg}</div>`).join("");el.scrollTop=el.scrollHeight;}
+}
+window._addLog=addLog;window._setChip=setChip;
+</script>
+
+<script>
+const DEFAULT_PASSWORD="bluebirds2025";
+let ADMIN_PASSWORD=localStorage.getItem("bbgh_pwd")||DEFAULT_PASSWORD;
+window.LOGS=[];window.FB_OK=false;
+window.D=JSON.parse(localStorage.getItem("bbgh_cache")||"null")||{
+  business:{name:"Bluebirds Gift House",tagline:"Premium frames, books & gifts. Free delivery in Akot.",wa:"919876543210",phone:"+91 98765 43210",city:"Akot, Maharashtra",waMsg:"Hi! I want to place an order from Bluebirds Gift House, Akot."},
+  hero:{title:"The Perfect Gift for Every Occasion",sub:"Premium photo frames, books & gifts. Free home delivery in Akot.",stats:{products:"50+",customers:"500+",years:"5+"}},
+  categories:[
+    {id:1,name:"Photo Frames",desc:"Premium wooden & metal frames",emoji:"🖼️",img:"",link:"frames",subcats:["Spiritual Frames","Family Frames","Couple Frames","Kids Frames"]},
+    {id:2,name:"Books",desc:"Academic, spiritual, fiction & more",emoji:"📚",img:"",link:"books",subcats:["Spiritual Books","Story Books","Academic Books"]},
+    {id:3,name:"Gifts & Hampers",desc:"Curated gift boxes for all occasions",emoji:"🎁",img:"",link:"gifts",subcats:["Birthday Gifts","Anniversary Gifts","Festival Gifts"]},
+    {id:4,name:"Stationery",desc:"Pens, notebooks & office supplies",emoji:"✏️",img:"",link:"stationery",subcats:[]},
+    {id:5,name:"Spiritual Items",desc:"Idols, diyas, pooja items",emoji:"🙏",img:"",link:"spiritual",subcats:["Idols","Diyas & Candles","Pooja Items"]},
+    {id:6,name:"Calendars & Diaries",desc:"Yearly planners & wall calendars",emoji:"📅",img:"",link:"calendars",subcats:[]}
+  ],
+  products:[
+    {id:1,name:"Classic Wooden Frame",cat:"frames",subcat:"Family Frames",emoji:"🖼️",img:"",images:[],video:"",desc:"Elegant solid wood frame with golden border.",sizes:["4×6","5×7","8×10","12×16"],price:299,originalPrice:450,badge:"Best Seller"},
+    {id:2,name:"Couple Photo Frame",cat:"frames",subcat:"Couple Frames",emoji:"💑",img:"",images:[],video:"",desc:"Beautiful dual frame for couples.",sizes:["5×7","8×10"],price:399,originalPrice:599,badge:"Popular"},
+    {id:3,name:"Spiritual Wall Frame",cat:"frames",subcat:"Spiritual Frames",emoji:"🙏",img:"",images:[],video:"",desc:"HD-printed spiritual images.",sizes:["6×8","8×10","12×16"],price:349,originalPrice:500,badge:"Trending"},
+    {id:4,name:"Kids Story Books Set",cat:"books",subcat:"Story Books",emoji:"📖",img:"",images:[],video:"",desc:"Colourful books for children.",sizes:["Set of 5","Set of 10"],price:199,originalPrice:350,badge:"New"},
+    {id:5,name:"Spiritual Books",cat:"books",subcat:"Spiritual Books",emoji:"🕉️",img:"",images:[],video:"",desc:"Sacred texts and spiritual books.",sizes:["Single","Set of 3"],price:149,originalPrice:250,badge:""},
+    {id:6,name:"Birthday Gift Hamper",cat:"gifts",subcat:"Birthday Gifts",emoji:"🎂",img:"",images:[],video:"",desc:"Beautiful gift hamper for birthdays.",sizes:["Small","Medium","Large"],price:499,originalPrice:699,badge:"New"}
+  ],
+  reviews:[
+    {id:1,name:"Sneha Wankhede",location:"Akot",stars:5,text:"Beautiful family frame! Quality outstanding, delivery super fast!"},
+    {id:2,name:"Rahul Deshmukh",location:"Akot",stars:5,text:"Ordered a spiritual frame for my parents. They loved it!"},
+    {id:3,name:"Pooja Agarwal",location:"Akot",stars:5,text:"The couple frame looks stunning. Very responsive on WhatsApp!"}
+  ],
+  design:{}
+};
+
+// login/logout defined above as window.login / window.logout
+
+async function publish(){
+  const btn=document.getElementById("PB");btn.disabled=true;btn.textContent="⏳ Publishing...";
+  if(window.fbPush){const r=await window.fbPush(D);if(r.ok){toast("✅ Published! Site updated instantly.","ok");btn.disabled=false;btn.innerHTML="☁️ Save &amp; Publish";return;}if(r.err?.includes("PERMISSION_DENIED")){toast("❌ Rules blocked — see Fix Firebase","err");btn.disabled=false;btn.innerHTML="☁️ Save &amp; Publish";pg("fix");return;}}
+  try{const r=await fetch(window.FB_URL+"/storeData.json",{method:"PUT",body:JSON.stringify(D),headers:{"Content-Type":"application/json"}});if(r.ok){localStorage.setItem("bbgh_cache",JSON.stringify(D));toast("✅ Published!","ok");}else{const t=await r.text();toast("❌ Failed","err");if(t.includes("Permission"))pg("fix");}}catch(e){toast("❌ Network error","err");}
+  btn.disabled=false;btn.innerHTML="☁️ Save &amp; Publish";
+}
+
+const NAV=["dash","prods","cats","revs","hero","biz","logo","colors","background","fonts","deploy","fix"];
+const TITLES={dash:"📊 Dashboard",prods:"🖼️ Products",cats:"🏷️ Categories",revs:"⭐ Reviews",hero:"🌟 Hero Banner",biz:"🏪 Business Info",logo:"🐦 Logo & Brand",colors:"🎨 Colors & Theme",background:"🖼️ Background",fonts:"✍️ Fonts & Text",deploy:"🚀 Deploy & Share",fix:"🔧 Fix Firebase"};
+window.pg=function pg(page){
+  document.querySelectorAll(".ni").forEach((el,i)=>el.classList.toggle("on",NAV[i]===page));
+  document.getElementById("TBT").textContent=TITLES[page]||page;
+  ({dash:pgDash,prods:pgProds,cats:pgCats,revs:pgRevs,hero:pgHero,biz:pgBiz,logo:pgLogo,colors:pgColors,background:pgBackground,fonts:pgFonts,deploy:pgDeploy,fix:pgFix})[page]?.();
+  document.getElementById("SB").classList.remove("open");
+}
+
+// ── IMAGE ZONE HELPERS ──
+function izSetup(zId,inpId,prevId){
+  const z=document.getElementById(zId),i=document.getElementById(inpId);if(!z||!i)return;
+  z.onclick=()=>{if(!z.classList.contains("loaded"))i.click();};
+  i.onchange=function(){const f=this.files[0];if(!f)return;if(f.size>10*1024*1024){toast("⚠️ Max 10MB","err");return;}const r=new FileReader();r.onload=ev=>{if(prevId)document.getElementById(prevId).value=ev.target.result;izLoad(zId,ev.target.result,inpId,prevId,f.type.startsWith("video"));};r.readAsDataURL(f);};
+}
+function izLoad(zId,src,inpId,prevId,isVid){
+  const z=document.getElementById(zId);if(!z)return;z.classList.add("loaded");
+  const xb=`<button class="izx" onclick="izClear(event,'${zId}','${inpId||""}','${prevId||""}')">✕</button>`;
+  z.innerHTML=isVid?`<video src="${src}" muted loop autoplay style="width:100%;height:100%;object-fit:cover">${xb}</video>`:`<img src="${src}" alt="">${xb}`;
+  z.onclick=()=>document.getElementById(inpId)?.click();
+}
+function izClear(e,zId,inpId,prevId){
+  e.stopPropagation();const z=document.getElementById(zId);if(!z)return;
+  z.classList.remove("loaded");z.innerHTML='<div style="font-size:1.5rem;margin-bottom:4px">📷</div><div style="font-size:.74rem;color:var(--light)">Click to upload</div>';
+  z.onclick=()=>document.getElementById(inpId)?.click();
+  if(inpId){const i=document.getElementById(inpId);if(i)i.value="";}
+  if(prevId){const p=document.getElementById(prevId);if(p)p.value="";}
+}
+function quickPick(accept,maxMB,cb){
+  const i=document.createElement("input");i.type="file";i.accept=accept;
+  i.onchange=()=>{const f=i.files[0];if(!f)return;if(f.size>maxMB*1024*1024){toast(`⚠️ Max ${maxMB}MB`,"err");return;}const r=new FileReader();r.onload=ev=>cb(ev.target.result);r.readAsDataURL(f);};i.click();
+}
+
+// ── DASHBOARD ──
+function pgDash(){
+  document.getElementById("MC").innerHTML=`
+  <div class="srow">
+    <div class="sc"><div class="sci">🖼️</div><div class="scn">${D.products.length}</div><div class="scl">Products</div></div>
+    <div class="sc"><div class="sci">🏷️</div><div class="scn">${D.categories.length}</div><div class="scl">Categories</div></div>
+    <div class="sc"><div class="sci">⭐</div><div class="scn">${D.reviews.length}</div><div class="scl">Reviews</div></div>
+    <div class="sc"><div class="sci">☁️</div><div class="scn" id="fbLv" style="font-size:.88rem;padding-top:12px">…</div><div class="scl">Firebase</div></div>
+  </div>
+  <div class="ib ig"><b>✅ Real-time sync active.</b> Click ☁️ Save & Publish after any change. Customer site updates in under 1 second!</div>
+  <div class="box"><div class="bh"><div class="bht">⚡ Quick Actions</div></div><div class="bb">
+    <div class="qlg">
+      <div class="ql" onclick="pg('prods')"><div class="qli">🖼️</div><div class="qln">Products</div></div>
+      <div class="ql" onclick="pg('cats')"><div class="qli">🏷️</div><div class="qln">Categories</div></div>
+      <div class="ql" onclick="pg('revs')"><div class="qli">⭐</div><div class="qln">Reviews</div></div>
+      <div class="ql" onclick="pg('colors')"><div class="qli">🎨</div><div class="qln">Colors</div></div>
+      <div class="ql" onclick="pg('logo')"><div class="qli">🐦</div><div class="qln">Logo</div></div>
+      <div class="ql" onclick="publish()"><div class="qli">☁️</div><div class="qln">Publish Now</div></div>
+    </div>
+  </div></div>`;
+  setTimeout(()=>{const el=document.getElementById("fbLv");if(el)el.textContent=window.FB_OK?"✅ Live":"❌ Check Fix tab";},2000);
+}
+
+// ── PRODUCTS ──
+function pgProds(){
+  const cats=D.categories||[];
+  document.getElementById("MC").innerHTML=`
+  <div class="box">
+    <div class="bh"><div class="bht">🖼️ All Products (${D.products.length})</div><button class="badd" onclick="showAddProd()">➕ Add Product</button></div>
+    <div class="bb"><div class="rows" id="PR">${buildProws()}</div></div>
+  </div>
+  <div class="box" id="APB" style="display:none">
+    <div class="bh"><div class="bht">➕ Add New Product</div><button onclick="this.closest('.box').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--mid)">✕</button></div>
+    <div class="bb">${addProdForm(cats)}</div>
+  </div>`;
+}
+function buildProws(){
+  return D.products.map(function(p){
+    var thumb=p.img?('<img src="'+p.img+'" alt="">'):( p.emoji||"🎁");
+    var sizes=(p.sizes||[]).join(", ");
+    var sub=p.subcat?" \u2192 "+p.subcat:"";
+    return '<div class="row">'
+      +'<div class="rth">'+thumb+'</div>'
+      +'<div class="ri"><div class="rn">'+p.name+'</div><div class="rm">\u20B9'+p.price+' \xB7 '+p.cat+sub+' \xB7 '+sizes+'</div></div>'
+      +'<div class="ra">'
+      +'<button class="bedit" onclick="pickProdImg('+p.id+')">📷</button>'
+      +'<button class="bedit" onclick="pickProdVid('+p.id+')">🎬</button>'
+      +'<button class="bdel" onclick="delProd('+p.id+')">🗑️</button>'
+      +'</div></div>';
+  }).join("");
+}
+function pickProdImg(id){quickPick("image/*",10,function(s){var p=D.products.find(function(x){return x.id===id;});if(p){p.img=s;publish();pgProds();toast("📷 Updated!","ok");}});}
+function pickProdVid(id){quickPick("video/*",15,function(s){var p=D.products.find(function(x){return x.id===id;});if(p){p.video=s;publish();pgProds();toast("🎬 Updated!","ok");}});}
+function delProd(id){if(confirm("Delete this product?")){D.products=D.products.filter(function(x){return x.id!==id;});publish();pgProds();}}
+function addProdForm(cats){
+  const catOpts=(cats||[]).map(c=>`<option value="${c.link||c.name.toLowerCase()}">${c.emoji||""} ${c.name}</option>`).join("");
+  return`
+  <div class="f2">
+    <div><label class="fl">📸 Main Image</label><div class="iz" id="z-pi"><div style="font-size:1.5rem">📷</div><div style="font-size:.74rem;color:var(--light)">Tap to upload</div></div><input type="file" id="i-pi" accept="image/*" style="display:none"><input type="hidden" id="v-pi"></div>
+    <div><label class="fl">🎬 Hover Video</label><div class="iz" id="z-pv"><div style="font-size:1.5rem">🎬</div><div style="font-size:.74rem;color:var(--light)">Short video</div></div><input type="file" id="i-pv" accept="video/*" style="display:none"><input type="hidden" id="v-pv"></div>
+  </div>
+  <label class="fl">📸 Gallery (extra angles)</label>
+  <div style="display:flex;gap:7px;margin-bottom:11px">
+    ${[0,1,2].map(n=>`<div><div class="iz" id="z-g${n}" style="width:82px;height:74px;padding:7px"><div style="font-size:1.1rem">🖼️</div></div><input type="file" id="i-g${n}" accept="image/*" style="display:none"><input type="hidden" id="v-g${n}"></div>`).join("")}
+  </div>
+  <div class="f2">
+    <div><label class="fl">Name *</label><input class="fi" id="np-n" placeholder="Classic Wooden Frame"></div>
+    <div><label class="fl">Emoji (if no image)</label><input class="fi" id="np-e" placeholder="🖼️" maxlength="4" style="font-size:1.3rem;width:70px"></div>
+  </div>
+  <div class="f2">
+    <div><label class="fl">Category *</label><select class="fi" id="np-c" onchange="updateSubcatSelect()">${catOpts}</select></div>
+    <div><label class="fl">Sub-category</label><select class="fi" id="np-sc"><option value="">— None —</option></select></div>
+  </div>
+  <div class="f2">
+    <div><label class="fl">Price ₹ *</label><input class="fi" id="np-p" placeholder="299" type="number"></div>
+    <div><label class="fl">Original Price ₹</label><input class="fi" id="np-o" placeholder="450" type="number"></div>
+  </div>
+  <div><label class="fl">Description</label><textarea class="fi" id="np-d" placeholder="Describe the product..."></textarea></div>
+  <div class="f2">
+    <div><label class="fl">Sizes (comma separated)</label><input class="fi" id="np-s" placeholder="4×6, 5×7, 8×10, 12×16"></div>
+    <div><label class="fl">Badge</label><input class="fi" id="np-b" placeholder="Best Seller / New / Trending"></div>
+  </div>
+  <button class="bfull" onclick="addProd()">➕ Add Product &amp; Publish</button>`;
+}
+function updateSubcatSelect(){
+  const catVal=document.getElementById("np-c")?.value;
+  const cat=D.categories.find(c=>c.link===catVal||c.name.toLowerCase()===catVal);
+  const sel=document.getElementById("np-sc");if(!sel)return;
+  sel.innerHTML='<option value="">— None —</option>';
+  (cat?.subcats||[]).forEach(s=>{const o=document.createElement("option");o.value=s;o.textContent=s;sel.appendChild(o);});
+}
+function showAddProd(){
+  const b=document.getElementById("APB");b.style.display="block";b.scrollIntoView({behavior:"smooth"});
+  setTimeout(()=>{
+    izSetup("z-pi","i-pi","v-pi");
+    const vz=document.getElementById("z-pv"),vi=document.getElementById("i-pv");
+    if(vz&&vi){vz.onclick=()=>{if(!vz.classList.contains("loaded"))vi.click();};vi.onchange=function(){const f=this.files[0];if(!f)return;if(f.size>15*1024*1024){toast("⚠️ Max 15MB","err");return;}const r=new FileReader();r.onload=ev=>{document.getElementById("v-pv").value=ev.target.result;izLoad("z-pv",ev.target.result,"i-pv","v-pv",true);};r.readAsDataURL(f);};}
+    [0,1,2].forEach(n=>izSetup(`z-g${n}`,`i-g${n}`,`v-g${n}`));
+    updateSubcatSelect();
+  },80);
+}
+function addProd(){
+  const name=document.getElementById("np-n")?.value.trim();if(!name){toast("⚠️ Enter product name","err");return;}
+  D.products.push({id:Date.now(),name,cat:document.getElementById("np-c")?.value||"frames",subcat:document.getElementById("np-sc")?.value||"",emoji:document.getElementById("np-e")?.value||"🎁",img:document.getElementById("v-pi")?.value||"",images:[0,1,2].map(n=>document.getElementById(`v-g${n}`)?.value||"").filter(Boolean),video:document.getElementById("v-pv")?.value||"",desc:document.getElementById("np-d")?.value||"",price:parseInt(document.getElementById("np-p")?.value)||299,originalPrice:parseInt(document.getElementById("np-o")?.value)||0,sizes:(document.getElementById("np-s")?.value||"Standard").split(",").map(s=>s.trim()),badge:document.getElementById("np-b")?.value||""});
+  publish();pgProds();toast("✓ Product added!","ok");
+}
+
+// ── CATEGORIES ──
+function pgCats(){
+  document.getElementById("MC").innerHTML=`
+  <div class="ib ig">✅ <b>Unlimited categories</b> — all of them show on the customer website in a beautiful grid!</div>
+  <div class="box">
+    <div class="bh"><div class="bht">🏷️ All Categories (${D.categories.length})</div></div>
+    <div class="bb"><div class="rows" id="CR">${buildCrows()}</div></div>
+  </div>
+  <div class="box">
+    <div class="bh"><div class="bht">➕ Add New Category</div></div>
+    <div class="bb">
+      <label class="fl">📸 Category Image</label>
+      <div class="iz" id="z-ci"><div style="font-size:1.5rem">🖼️</div><div style="font-size:.74rem;color:var(--light)">Tap to upload</div></div>
+      <input type="file" id="i-ci" accept="image/*" style="display:none"><input type="hidden" id="v-ci">
+      <div class="f2">
+        <div><label class="fl">Name *</label><input class="fi" id="nc-n" placeholder="e.g. Photo Frames"></div>
+        <div><label class="fl">Emoji</label><input class="fi" id="nc-e" placeholder="🖼️" maxlength="4" style="font-size:1.3rem;width:70px"></div>
+      </div>
+      <div class="f2">
+        <div><label class="fl">Description</label><input class="fi" id="nc-d" placeholder="Short description"></div>
+        <div><label class="fl">Link Key (one word)</label><input class="fi" id="nc-l" placeholder="frames / books / gifts"></div>
+      </div>
+      <label class="fl">Sub-categories (press Enter after each one)</label>
+      <div id="subcat-chips-new" class="subcat-chips"></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input class="fi" id="nc-sc-input" placeholder="Type sub-category name..." style="margin:0;flex:1" onkeydown="if(event.key==='Enter'){event.preventDefault();addSubcatNew();}">
+        <button class="badd" onclick="addSubcatNew()" style="white-space:nowrap">+ Add</button>
+      </div>
+      <button class="bfull" onclick="addCat()">➕ Add Category &amp; Publish</button>
+    </div>
+  </div>`;
+  setTimeout(()=>izSetup("z-ci","i-ci","v-ci"),60);
+  window._newSubcats=[];
+}
+function buildCrows(){
+  return D.categories.map(function(c){
+    var thumb=c.img?('<img src="'+c.img+'" alt="">'):( c.emoji||"🎁");
+    var subcatHtml="";
+    if((c.subcats||[]).length){
+      subcatHtml='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">'+(c.subcats.map(function(s){return'<span style="background:var(--pale);border:var(--border);border-radius:50px;padding:2px 8px;font-size:.68rem;color:var(--mid)">'+s+'</span>';})).join("")+"</div>";
+    }
+    return '<div class="row" style="flex-wrap:wrap;gap:8px;height:auto;padding:12px">'
+      +'<div class="rth">'+thumb+'</div>'
+      +'<div class="ri">'
+        +'<div class="rn">'+(c.emoji||"")+" "+c.name+'</div>'
+        +'<div class="rm">'+(c.desc||"")+'</div>'
+        +subcatHtml
+      +'</div>'
+      +'<div class="ra" style="align-self:flex-start">'
+        +'<button class="bedit" onclick="pickCatImg('+c.id+')">📷</button>'
+        +'<button class="bedit" onclick="editCatSubcats('+c.id+')">✏️ Subcats</button>'
+        +'<button class="bdel" onclick="delCat('+c.id+')">🗑️</button>'
+      +'</div></div>';
+  }).join("");
+}
+function pickCatImg(id){quickPick("image/*",10,function(s){var c=D.categories.find(function(x){return x.id===id;});if(c){c.img=s;publish();pgCats();toast("📷 Updated!","ok");}});}
+function delCat(id){if(confirm("Delete this category?")){D.categories=D.categories.filter(function(x){return x.id!==id;});publish();pgCats();}}
+window._newSubcats=[];
+function addSubcatNew(){
+  const inp=document.getElementById("nc-sc-input");const val=inp?.value.trim();if(!val)return;
+  window._newSubcats.push(val);inp.value="";
+  const el=document.getElementById("subcat-chips-new");if(!el)return;
+  el.innerHTML=window._newSubcats.map((s,i)=>`<div class="subcat-chip">${s}<button onclick="window._newSubcats.splice(${i},1);document.getElementById('subcat-chips-new').innerHTML=window._newSubcats.map((x,j)=>'<div class=subcat-chip>'+x+'<button onclick=\\'window._newSubcats.splice('+j+',1)\\'>×</button></div>').join('')">×</button></div>`).join("");
+}
+function addCat(){
+  const name=document.getElementById("nc-n").value.trim();if(!name){toast("⚠️ Enter name","err");return;}
+  D.categories.push({id:Date.now(),name,emoji:document.getElementById("nc-e").value||"🎁",desc:document.getElementById("nc-d").value||"",link:document.getElementById("nc-l").value||name.toLowerCase().replace(/\s+/g,"-"),img:document.getElementById("v-ci").value||"",subcats:window._newSubcats||[]});
+  window._newSubcats=[];publish();pgCats();toast("✓ Category added!","ok");
+}
+function editCatSubcats(id){
+  const cat=D.categories.find(c=>c.id===id);if(!cat)return;
+  const current=prompt(`Edit sub-categories for "${cat.name}".\nCurrent: ${(cat.subcats||[]).join(", ")}\n\nEnter all sub-categories separated by commas (or leave blank to clear):`);
+  if(current===null)return;
+  cat.subcats=current.split(",").map(s=>s.trim()).filter(Boolean);
+  publish();pgCats();toast("✓ Sub-categories updated!","ok");
+}
+
+// ── REVIEWS ──
+function pgRevs(){
+  document.getElementById("MC").innerHTML=`
+  <div class="box"><div class="bh"><div class="bht">⭐ Reviews (${D.reviews.length})</div></div><div class="bb">
+    ${D.reviews.map(r=>{
+      var stars="★".repeat(r.stars||5);
+      return '<div class="row" style="height:auto;padding:12px;margin-bottom:8px;flex-wrap:wrap">'
+        +'<div style="flex:1"><div style="color:var(--gold2);margin-bottom:3px">'+stars+'</div>'
+        +'<div style="font-size:.82rem;color:var(--mid);font-style:italic;margin-bottom:4px">"'+r.text+'"</div>'
+        +'<div style="font-size:.73rem;color:var(--light)">\u2014 '+r.name+", "+(r.location||"Akot")+'</div></div>'
+        +'<button class="bdel" onclick="delRev('+r.id+')" style="align-self:flex-start">\uD83D\uDDD1\uFE0F</button>'
+        +'</div>';
+    }).join("")}
+  </div></div>
+  <div class="box"><div class="bh"><div class="bht">➕ Add Review</div></div><div class="bb">
+    <div class="f2"><div><label class="fl">Name</label><input class="fi" id="nr-n" placeholder="Sneha Wankhede"></div><div><label class="fl">Location</label><input class="fi" id="nr-l" placeholder="Akot"></div></div>
+    <label class="fl">Review Text</label><textarea class="fi" id="nr-t" placeholder="What did they say?"></textarea>
+    <label class="fl">Stars</label><input class="fi" id="nr-s" type="number" min="1" max="5" value="5" style="width:70px;margin-bottom:14px">
+    <button class="bfull" onclick="addRev()">➕ Add &amp; Publish</button>
+  </div></div>`;
+}
+function delRev(id){if(confirm("Delete this review?")){D.reviews=D.reviews.filter(function(x){return x.id!==id;});publish();pgRevs();}}
+function addRev(){
+  const name=document.getElementById("nr-n").value.trim(),text=document.getElementById("nr-t").value.trim();if(!name||!text){toast("⚠️ Enter name and review","err");return;}
+  D.reviews.push({id:Date.now(),name,location:document.getElementById("nr-l").value||"Akot",stars:parseInt(document.getElementById("nr-s").value)||5,text,avatar:""});
+  publish();pgRevs();toast("✓ Review added!","ok");
+}
+
+// ── HERO ──
+function pgHero(){
+  const h=D.hero||{},s=h.stats||{};
+  document.getElementById("MC").innerHTML=`
+  <div class="box"><div class="bh"><div class="bht">🌟 Hero Banner</div></div><div class="bb">
+    <label class="fl">Main Headline</label><input class="fi" id="h-t" value="${(h.title||"").replace(/"/g,"&quot;")}">
+    <label class="fl">Sub Text</label><textarea class="fi" id="h-s">${h.sub||""}</textarea>
+    <div class="f3">
+      <div><label class="fl">Products Count</label><input class="fi" id="h-p" value="${s.products||"50+"}"></div>
+      <div><label class="fl">Customers Count</label><input class="fi" id="h-c" value="${s.customers||"500+"}"></div>
+      <div><label class="fl">Years</label><input class="fi" id="h-y" value="${s.years||"5+"}"></div>
+    </div>
+    <button class="bfull" onclick="D.hero={title:document.getElementById('h-t').value,sub:document.getElementById('h-s').value,stats:{products:document.getElementById('h-p').value,customers:document.getElementById('h-c').value,years:document.getElementById('h-y').value}};publish();toast('✅ Saved!','ok')">💾 Save &amp; Publish</button>
+  </div></div>`;
+}
+
+// ── BUSINESS ──
+function pgBiz(){
+  const b=D.business||{};
+  document.getElementById("MC").innerHTML=`
+  <div class="box"><div class="bh"><div class="bht">🏪 Business Info</div></div><div class="bb">
+    <label class="fl">Store Name</label><input class="fi" id="b-n" value="${b.name||""}">
+    <label class="fl">Tagline</label><input class="fi" id="b-t" value="${b.tagline||""}">
+    <div class="f2">
+      <div><label class="fl">WhatsApp (digits only e.g. 919876543210)</label><input class="fi" id="b-w" value="${b.wa||""}" placeholder="919876543210"></div>
+      <div><label class="fl">Display Phone</label><input class="fi" id="b-p" value="${b.phone||""}"></div>
+    </div>
+    <div class="f2">
+      <div><label class="fl">City</label><input class="fi" id="b-c" value="${b.city||"Akot, Maharashtra"}"></div>
+      <div><label class="fl">Instagram</label><input class="fi" id="b-i" value="${b.insta||""}" placeholder="@bluebirdsgifthouse"></div>
+    </div>
+    <label class="fl">Default WhatsApp Message</label><textarea class="fi" id="b-m">${b.waMsg||"Hi! I want to place an order."}</textarea>
+    <button class="bfull" onclick="D.business={name:document.getElementById('b-n').value,tagline:document.getElementById('b-t').value,wa:document.getElementById('b-w').value,phone:document.getElementById('b-p').value,city:document.getElementById('b-c').value,insta:document.getElementById('b-i').value,waMsg:document.getElementById('b-m').value};publish();toast('✅ Saved!','ok')">💾 Save &amp; Publish</button>
+  </div></div>
+  <div class="box"><div class="bh"><div class="bht">🔑 Change Password</div></div><div class="bb">
+    <div class="f3">
+      <div><label class="fl">Current Password</label><input class="fi" type="password" id="pwd-o" placeholder="Current"></div>
+      <div><label class="fl">New Password</label><input class="fi" type="password" id="pwd-n" placeholder="Min 6 chars"></div>
+      <div><label class="fl">Confirm New</label><input class="fi" type="password" id="pwd-c" placeholder="Repeat new"></div>
+    </div>
+    <button class="bfull" onclick="changePwd()">🔑 Update Password</button>
+  </div></div>`;
+}
+function changePwd(){
+  const o=document.getElementById("pwd-o").value,n=document.getElementById("pwd-n").value,c=document.getElementById("pwd-c").value;
+  if(o!==ADMIN_PASSWORD){toast("❌ Current password wrong","err");return;}
+  if(n.length<6){toast("⚠️ Min 6 characters","err");return;}
+  if(n!==c){toast("❌ Passwords don't match","err");return;}
+  ADMIN_PASSWORD=n;localStorage.setItem("bbgh_pwd",n);
+  toast("✅ Password changed! Remember your new password.","ok");
+  ["pwd-o","pwd-n","pwd-c"].forEach(id=>document.getElementById(id).value="");
+}
+
+// ════════════════════════════════════
+// DESIGN PAGES
+// ════════════════════════════════════
+function ensureDesign(){D.design=D.design||{};}
+
+// ── LOGO & BRAND ──
+function pgLogo(){
+  ensureDesign();const d=D.design;
+  document.getElementById("MC").innerHTML=`
+  <div class="ib ig">🐦 Upload your shop logo. It will replace the bird emoji in the top-left corner of the website.</div>
+  <div class="box"><div class="bh"><div class="bht">🐦 Shop Logo</div></div><div class="bb">
+    <div class="f2">
+      <div>
+        <label class="fl">Upload Logo Image</label>
+        <div class="iz ${d.logo?'loaded':''}" id="z-logo" style="${d.logo?'height:120px;display:block':''}">
+          ${d.logo?`<img src="${d.logo}" alt="" style="object-fit:contain"><button class="izx" onclick="D.design.logo='';publish();pgLogo()">✕</button>`:'<div style="font-size:1.5rem">🏪</div><div style="font-size:.74rem;color:var(--light)">Upload your logo</div>'}
+        </div>
+        <input type="file" id="i-logo" accept="image/*" style="display:none">
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:10px;padding:10px">
+        ${d.logo?'<div style="color:var(--green);font-weight:600;font-size:.83rem">✅ Custom logo active</div>':'<div style="font-size:.82rem;color:var(--light)">Currently: 🐦 emoji</div>'}
+        <div style="font-size:.8rem;color:var(--mid)">Best: Square PNG, at least 80×80px<br>Max file size: 5MB</div>
+        ${d.logo?`<button class="bdel" onclick="D.design.logo='';publish();pgLogo()">↩️ Remove logo (use 🐦)</button>`:''}
+      </div>
+    </div>
+  </div></div>
+  <div class="box"><div class="bh"><div class="bht">🏷️ Site Tagline in Hero</div></div><div class="bb">
+    <label class="fl">Hero Tag Text (shown above headline)</label>
+    <input class="fi" id="hero-tag" value="${d.heroTag||'🐦 Akot\\'s Favourite Gift Store'}" placeholder="🐦 Akot's Favourite Gift Store">
+    <button class="bfull" onclick="D.design.heroTag=document.getElementById('hero-tag').value;publish();toast('✅ Saved!','ok')">💾 Save &amp; Publish</button>
+  </div></div>`;
+  const lz=document.getElementById("z-logo"),li=document.getElementById("i-logo");
+  if(!d.logo&&lz&&li){lz.onclick=()=>li.click();li.onchange=function(){const f=this.files[0];if(!f)return;if(f.size>5*1024*1024){toast("⚠️ Max 5MB","err");return;}const r=new FileReader();r.onload=ev=>{D.design.logo=ev.target.result;publish();pgLogo();toast("✅ Logo uploaded!","ok");};r.readAsDataURL(f);};}
+}
+
+// ── COLORS & THEME ──
+function pgColors(){
+  ensureDesign();const d=D.design;
+  const themes=[
+    {name:"Golden Warmth",primary:"#2d1a08",secondary:"#c9973a",accent:"#b5451b",bg:"#fdf8f0",badge:"Default"},
+    {name:"Royal Purple",primary:"#1a0830",secondary:"#7c3aed",accent:"#dc2626",bg:"#faf5ff",badge:"Premium"},
+    {name:"Ocean Blue",primary:"#0c2340",secondary:"#0ea5e9",accent:"#f97316",bg:"#f0f9ff",badge:"Fresh"},
+    {name:"Forest Green",primary:"#0f2d1a",secondary:"#16a34a",accent:"#dc2626",bg:"#f0fdf4",badge:"Natural"},
+    {name:"Rose Pink",primary:"#2d0f1a",secondary:"#ec4899",accent:"#f59e0b",bg:"#fff1f2",badge:"Elegant"},
+    {name:"Midnight Dark",primary:"#0f0f0f",secondary:"#e8b84b",accent:"#ef4444",bg:"#1a1a1a",badge:"Bold"},
+    {name:"Maroon Royal",primary:"#4a0010",secondary:"#b8860b",accent:"#8b0000",bg:"#fff8f0",badge:"Festive"},
+    {name:"Teal Fresh",primary:"#0f2d2d",secondary:"#0d9488",accent:"#f97316",bg:"#f0fdfa",badge:"Modern"},
+  ];
+  const themeCards = themes.map(t => {
+    const active = isActiveTheme(t,d);
+    const borderColor = active ? "#c9973a" : "#e8d5b0";
+    const extraStyle = active ? "box-shadow:0 0 0 3px rgba(201,151,58,.2)" : "";
+    return `<div onclick="applyTheme(this)" data-primary="${t.primary}" data-secondary="${t.secondary}" data-accent="${t.accent}" data-bg="${t.bg}" style="border:2px solid ${borderColor};border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;${extraStyle}">
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <div style="width:28px;height:28px;border-radius:50%;background:${t.primary}"></div>
+        <div style="width:28px;height:28px;border-radius:50%;background:${t.secondary}"></div>
+        <div style="width:28px;height:28px;border-radius:50%;background:${t.accent}"></div>
+        <div style="width:28px;height:28px;border-radius:50%;background:${t.bg};border:1px solid #e0d0bc"></div>
+      </div>
+      <div style="font-weight:600;font-size:.84rem;color:var(--warm);margin-bottom:2px">${t.name}</div>
+      <div style="font-size:.7rem;background:var(--pale);border-radius:50px;padding:2px 8px;display:inline-block;color:var(--mid)">${t.badge}</div>
+      ${active ? '<div style="font-size:.7rem;color:var(--green);margin-top:4px;font-weight:700">&#x2705; Active</div>' : ''}
+    </div>`;
+  }).join("");
+
+  document.getElementById("MC").innerHTML=`
+  <div class="ib io">&#127912; Choose a ready-made theme OR pick custom colours below. Click &#x2601;&#xFE0F; Save & Publish to apply.</div>
+  <div class="box"><div class="bh"><div class="bht">&#127912; Ready-Made Themes</div></div><div class="bb">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px" id="themeGrid"></div>
+  </div></div>
+  <div class="box"><div class="bh"><div class="bht">&#128396; Custom Colours</div></div><div class="bb">
+    ${colorRow("Primary (header, buttons)", "primaryColor", d.primaryColor||"#2d1a08", ["#2d1a08","#1a0830","#0c2340","#0f2d1a","#2d0f1a","#0f0f0f","#4a0010","#0f2d2d"])}
+    ${colorRow("Secondary (gold accents)", "secondaryColor", d.secondaryColor||"#c9973a", ["#c9973a","#7c3aed","#0ea5e9","#16a34a","#ec4899","#e8b84b","#b8860b","#0d9488"])}
+    ${colorRow("Accent (badges, alerts)", "accentColor", d.accentColor||"#b5451b", ["#b5451b","#dc2626","#f97316","#8b5cf6","#ec4899","#ef4444","#8b0000","#f59e0b"])}
+    ${colorRow("Page Background", "bgColor", d.bgColor||"#fdf8f0", ["#fdf8f0","#faf5ff","#f0f9ff","#f0fdf4","#fff1f2","#1a1a1a","#fff8f0","#f0fdfa"])}
+    <button class="bfull" onclick="saveCustomColors()">&#x1F4BE; Save Custom Colors &amp; Publish</button>
+    ${(d.primaryColor||d.secondaryColor)?`<button class="bdel" style="margin-top:8px;width:100%;border-radius:50px" onclick="D.design.primaryColor='';D.design.secondaryColor='';D.design.accentColor='';D.design.bgColor='';publish();pgColors();toast('Reset to default','ok')">&#x21A9;&#xFE0F; Reset All to Default</button>`:''}
+  </div></div>`;
+  document.getElementById("themeGrid").innerHTML = themeCards;
+}
+
+function isActiveTheme(t,d){return d.primaryColor===t.primary&&d.secondaryColor===t.secondary;}
+function colorRow(label,key,current,presets){
+  return`<div style="margin-bottom:16px">
+    <div class="fl" style="margin-bottom:8px">${label}</div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="color-preview" style="background:${current}"><input type="color" id="cp-${key}" value="${current}"></div>
+      <div class="presets">${presets.map(c=>`<div class="preset" style="background:${c}" onclick="document.getElementById('cp-${key}').value='${c}';document.getElementById('cp-${key}').dispatchEvent(new Event('input'))" title="${c}"></div>`).join("")}</div>
+    </div>
+  </div>`;
+}
+function applyTheme(el){
+  ensureDesign();
+  D.design.primaryColor=el.dataset.primary;
+  D.design.secondaryColor=el.dataset.secondary;
+  D.design.accentColor=el.dataset.accent;
+  D.design.bgColor=el.dataset.bg;
+  publish();pgColors();toast("✅ Theme applied!","ok");
+}
+function saveCustomColors(){
+  ensureDesign();
+  ["primaryColor","secondaryColor","accentColor","bgColor"].forEach(k=>{const el=document.getElementById("cp-"+k);if(el)D.design[k]=el.value;});
+  publish();toast("✅ Colors saved!","ok");
+}
+
+// ── BACKGROUND ──
+function pgBackground(){
+  ensureDesign();const d=D.design;
+  document.getElementById("MC").innerHTML=`
+  <div class="box"><div class="bh"><div class="bht">🖼️ Hero Section Background</div></div><div class="bb">
+    <div class="ib io">This is the big top section customers see first. You can use a photo, a colour, or leave it as the default cream.</div>
+    <label class="fl">Background Photo</label>
+    <div class="iz ${d.heroBg?'loaded':''}" id="z-hbg" style="${d.heroBg?'height:160px;display:block':''}">
+      ${d.heroBg?`<img src="${d.heroBg}" alt=""><button class="izx" onclick="D.design.heroBg='';publish();pgBackground()">✕</button>`:'<div style="font-size:1.5rem">🌄</div><div style="font-size:.74rem;color:var(--light)">Upload background photo (wide/landscape)</div>'}
+    </div>
+    <input type="file" id="i-hbg" accept="image/*" style="display:none">
+    ${d.heroBg?`<button class="bdel" style="margin-bottom:12px" onclick="D.design.heroBg='';publish();pgBackground()">🗑️ Remove Photo</button>`:''}
+    <label class="fl">Background Colour (if no photo)</label>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+      <div class="color-preview" style="background:${d.heroColor||'#fdf5e6'}"><input type="color" id="cp-heroColor" value="${d.heroColor||'#fdf5e6'}"></div>
+      <div class="presets">
+        ${[["#fdf5e6","Cream"],["#fff0f0","Soft Pink"],["#f0f4ff","Soft Blue"],["#f0fff4","Soft Green"],["#1a1008","Dark Brown"],["#0d0d0d","Black"],["#4a0010","Maroon"],["#0f2d2d","Dark Teal"]].map(([c,n])=>`<div class="preset" style="background:${c}" onclick="document.getElementById('cp-heroColor').value='${c}'" title="${n}"></div>`).join("")}
+      </div>
+    </div>
+    <button class="bfull" onclick="D.design.heroColor=document.getElementById('cp-heroColor').value;publish();toast('✅ Saved!','ok')">💾 Save Background Colour</button>
+  </div></div>
+
+  <div class="box"><div class="bh"><div class="bht">🔝 Navigation Bar Colour</div></div><div class="bb">
+    <label class="fl">Navbar Background</label>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+      <div class="color-preview" style="background:${d.navColor||'#fdf8f0'}"><input type="color" id="cp-navColor" value="${d.navColor||'#fdf8f0'}"></div>
+      <div class="presets">
+        ${[["#fdf8f0","Cream"],["#2d1a08","Dark Brown"],["#1a3d2e","Dark Green"],["#1a1a2e","Navy"],["#ffffff","White"],["#000000","Black"],["#4a0010","Maroon"],["#0f2d2d","Teal"]].map(([c,n])=>`<div class="preset" style="background:${c};border:1px solid rgba(0,0,0,.1)" onclick="document.getElementById('cp-navColor').value='${c}'" title="${n}"></div>`).join("")}
+      </div>
+    </div>
+    <button class="bfull" onclick="D.design.navColor=document.getElementById('cp-navColor').value;publish();toast('✅ Saved!','ok')">💾 Save Navbar Colour</button>
+  </div></div>
+
+  <div class="box"><div class="bh"><div class="bht">🟢 WhatsApp Banner Colour</div></div><div class="bb">
+    <label class="fl">Bottom Banner Background</label>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+      <div class="color-preview" style="background:${d.bannerColor||'#1a3d2e'}"><input type="color" id="cp-bannerColor" value="${d.bannerColor||'#1a3d2e'}"></div>
+      <div class="presets">
+        ${[["#1a3d2e","Dark Green"],["#1a1a2e","Navy"],["#2d1a08","Dark Brown"],["#4a0010","Maroon"],["#0f2d2d","Teal"],["#1a1008","Near Black"],["#0c1a4a","Deep Blue"],["#2d0f1a","Deep Rose"]].map(([c,n])=>`<div class="preset" style="background:${c}" onclick="document.getElementById('cp-bannerColor').value='${c}'" title="${n}"></div>`).join("")}
+      </div>
+    </div>
+    <button class="bfull" onclick="D.design.bannerColor=document.getElementById('cp-bannerColor').value;publish();toast('✅ Saved!','ok')">💾 Save Banner Colour</button>
+  </div></div>`;
+
+  const bz=document.getElementById("z-hbg"),bi=document.getElementById("i-hbg");
+  if(!d.heroBg&&bz&&bi){bz.onclick=()=>bi.click();bi.onchange=function(){const f=this.files[0];if(!f)return;if(f.size>8*1024*1024){toast("⚠️ Max 8MB","err");return;}const r=new FileReader();r.onload=ev=>{D.design.heroBg=ev.target.result;publish();pgBackground();toast("✅ Background uploaded!","ok");};r.readAsDataURL(f);};}
+}
+
+// ── FONTS ──
+function pgFonts(){
+  ensureDesign();const d=D.design;
+  const fonts=[
+    {name:"DM Sans + Playfair",val:"DM Sans",preview:"DM Sans",desc:"Current — clean & premium"},
+    {name:"Inter + Playfair",val:"'Inter', sans-serif",preview:"Inter",desc:"Modern & minimal"},
+    {name:"Poppins",val:"'Poppins', sans-serif",preview:"Poppins",desc:"Friendly & rounded"},
+    {name:"Lato",val:"'Lato', sans-serif",preview:"Lato",desc:"Professional & clean"},
+    {name:"Nunito",val:"'Nunito', sans-serif",preview:"Nunito",desc:"Soft & warm"},
+    {name:"Raleway",val:"'Raleway', sans-serif",preview:"Raleway",desc:"Stylish & elegant"},
+  ];
+  document.getElementById("MC").innerHTML=`
+  <div class="ib io">✍️ Choose a font style for your website. All fonts are free and load from Google.</div>
+  <div class="box"><div class="bh"><div class="bht">✍️ Font Style</div></div><div class="bb">
+    <div class="font-grid">
+      ${fonts.map(f=>`
+        <div class="font-opt ${(d.fontFamily||"DM Sans").includes(f.preview)?'on':''}" onclick="D.design.fontFamily='${f.val}';publish();pgFonts();toast('✅ Font saved!','ok')">
+          <div class="font-name" style="font-family:${f.val}">${f.name}</div>
+          <div class="font-preview" style="font-family:${f.val}">Gift House</div>
+          <div style="font-size:.7rem;color:var(--light);margin-top:4px">${f.desc}</div>
+          ${(d.fontFamily||"DM Sans").includes(f.preview)?'<div style="font-size:.7rem;color:var(--green);font-weight:700;margin-top:4px">✅ Active</div>':''}
+        </div>`).join("")}
+    </div>
+  </div></div>
+  <div class="box"><div class="bh"><div class="bht">📏 Section Labels</div></div><div class="bb">
+    <div class="ib io">These are the small labels that appear above each section title on your website (like "Browse by Category").</div>
+    <div class="f2">
+      <div><label class="fl">Categories Section Label</label><input class="fi" id="lbl-cat" value="${d.lblCat||'✦ Browse by Category ✦'}" placeholder="✦ Browse by Category ✦"></div>
+      <div><label class="fl">Products Section Label</label><input class="fi" id="lbl-prod" value="${d.lblProd||'✦ Our Collection ✦'}" placeholder="✦ Our Collection ✦"></div>
+    </div>
+    <div class="f2">
+      <div><label class="fl">Reviews Section Label</label><input class="fi" id="lbl-rev" value="${d.lblRev||'✦ Happy Customers ✦'}" placeholder="✦ Happy Customers ✦"></div>
+      <div><label class="fl">Why Us Section Label</label><input class="fi" id="lbl-why" value="${d.lblWhy||'✦ Our Promise ✦'}" placeholder="✦ Our Promise ✦"></div>
+    </div>
+    <button class="bfull" onclick="D.design.lblCat=document.getElementById('lbl-cat').value;D.design.lblProd=document.getElementById('lbl-prod').value;D.design.lblRev=document.getElementById('lbl-rev').value;D.design.lblWhy=document.getElementById('lbl-why').value;publish();toast('✅ Labels saved!','ok')">💾 Save Labels &amp; Publish</button>
+  </div></div>`;
+}
+
+// ── DEPLOY ──
+function pgDeploy(){
+  document.getElementById("MC").innerHTML=`
+  <div class="ib ig"><b>✅ Real-time sync active!</b> Changes publish to the customer site in under 1 second.</div>
+  <div class="box"><div class="bh"><div class="bht">🔗 Your Links</div></div><div class="bb">
+    <div class="ib io"><b>📲 Customer website (share this):</b><br><code>https://bluebirdsgifthouse.github.io</code></div>
+    <div class="ib ir"><b>🔒 Admin panel (keep private):</b><br><code>https://bluebirdsgifthouse.github.io/admin.html</code></div>
+  </div></div>
+  <div class="box"><div class="bh"><div class="bht">⬇️ Download Files</div></div><div class="bb">
+    <div class="ib io">Only re-upload to Netlify if the website design changed. For products, prices, images — just click ☁️ Publish.</div>
+    <button class="bfull" style="width:auto;padding:11px 22px" onclick="const b=new Blob([document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='admin.html';a.click();toast('⬇️ Downloaded!','ok')">⬇️ Download admin.html</button>
+  </div></div>`;
+}
+
+// ── FIX FIREBASE ──
+function pgFix(){
+  document.getElementById("MC").innerHTML=`
+  <div class="ib ig"><b>Firebase Project: BlueBirdsGiftHouse</b><br>DB: <code>bluebirdsgifthouse-default-rtdb.asia-southeast1.firebasedatabase.app</code></div>
+  <div class="box"><div class="bh"><div class="bht">✅ Step 1 — Set Database Rules</div></div><div class="bb">
+    <div class="ib io">Go to <b>console.firebase.google.com</b> → <b>BlueBirdsGiftHouse</b> → Build → Realtime Database → <b>Rules tab</b> → delete everything → paste below → click <b>Publish</b> → click <b>"Publish anyway"</b> on the popup</div>
+    <div class="codebox">{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}<button class="cbcopy" onclick="navigator.clipboard?.writeText('{\n  \"rules\": {\n    \".read\": true,\n    \".write\": true\n  }\n}').then(()=>toast('📋 Copied!','ok'))">📋 Copy</button></div>
+    <div class="ib ir">⚠️ After clicking Publish, a warning popup appears. Click <b>"Publish anyway"</b> — NOT Dismiss!</div>
+  </div></div>
+  <div class="box"><div class="bh"><div class="bht">🔄 Step 2 — Test Connection</div></div><div class="bb">
+    <button class="tbtn bl" onclick="runTest()">🔄 Test Firebase Now</button>
+    <div class="tres" id="tres"></div>
+  </div></div>
+  <div class="box"><div class="bh"><div class="bht">📋 Log</div><button class="bedit" onclick="window.LOGS=[];document.getElementById('logBox').innerHTML='';toast('Cleared','info')">🗑️</button></div>
+  <div class="bb"><div class="log" id="logBox">${(window.LOGS||[]).map(l=>`<div style="color:${({ok:"#86efac",err:"#fca5a5",warn:"#fde68a",info:"#93c5fd"})[l.type]||"#93c5fd"}">[${l.t}] ${l.msg}</div>`).join("")||"<div style='color:#6b7280'>No logs</div>"}</div></div></div>`;
+}
+async function runTest(){
+  const res=document.getElementById("tres");res.className="tres on";res.textContent="⏳ Testing...";
+  try{const r=await fetch(window.FB_URL+"/_test.json",{method:"PUT",body:JSON.stringify({ts:Date.now()}),headers:{"Content-Type":"application/json"}});const t=await r.text();
+    if(r.ok){res.className="tres on ok";res.innerHTML="✅ <b>Firebase is working!</b> Click ☁️ Save & Publish now.";window._setChip?.("g","✅ Connected");window.FB_OK=true;}
+    else{res.className="tres on bad";res.innerHTML=t.includes("Permission")?"❌ <b>Still PERMISSION DENIED</b> — make sure you clicked <b>'Publish anyway'</b> on the popup in Step 1.":"❌ Error: "+t.slice(0,80);}
+  }catch(e){res.className="tres on bad";res.innerHTML="❌ Network error: "+e.message;}
+}
+
+function toast(msg,type="info"){const t=document.getElementById("T");t.textContent=msg;t.className="toast show "+type;setTimeout(()=>t.classList.remove("show"),3500);}
+window.addEventListener("DOMContentLoaded",()=>document.getElementById("lpwd").focus());
+</script>
+</body>
+</html>
